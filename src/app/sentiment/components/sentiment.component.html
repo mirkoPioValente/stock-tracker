@@ -1,0 +1,74 @@
+<div class="container py-6 h-screen columns-1">
+  <div class="rounded-lg bg-white p-5 mt-32">
+    <div *ngIf="symbolData && sentimentDatas; else searchingDatasTemplate">
+      <div class="flex flex-row" *ngIf="symbolData">
+        <span class="font-bold text-4xl basis-11/12 pl-12">
+          {{ symbolData.description }}
+        </span>
+        <span
+          class="rounded-lg bg-midnight text-white p-2 basis-1/12 text-center"
+        >
+          <span class="font-bold text-xl text-right">
+            {{ symbolData.symbol }}
+          </span>
+        </span>
+      </div>
+
+      <div
+        class="container clear-both pt-4"
+        *ngIf="sentimentDatas.length !== 0; else noSentimentDatasTemplate"
+      >
+        <div class="grid grid-cols-3 gap-1">
+          <div *ngFor="let sentimentData of sentimentDatas">
+            <div
+              class="float-right pr-12 py-4 text-4xl"
+              [ngClass]="
+                sentimentData.change > 0
+                  ? { 'text-green-400': true }
+                  : sentimentData.change < 0
+                  ? { 'text-red-700': true }
+                  : { 'text-gray': true }
+              "
+            >
+              {{
+                sentimentData.change > 0
+                  ? "▲"
+                  : sentimentData.change < 0
+                  ? "▼"
+                  : "⮁"
+              }}
+            </div>
+            <div>
+              <p class="font-bold text-2xl">
+                {{ sentimentData.month | month | uppercase }}
+                {{ sentimentData.year }}
+              </p>
+              <p>Change: {{ sentimentData.change }}</p>
+              <p>MSPR: {{ sentimentData.mspr }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    class="bg-blue-700 text-white italic font-bold py-2 mt-10 rounded-lg px-5 cursor-pointer"
+    routerLink="/"
+    id="backBtn"
+  >
+    🠘 Back to list of stocks
+  </button>
+</div>
+
+<ng-template #searchingDatasTemplate>
+  <span class="font-bold text-4xl pl-12">
+    I'm collecting the data... Please wait!
+  </span>
+</ng-template>
+
+<ng-template #noSentimentDatasTemplate>
+  <div class="italic text-2xl pl-32 my-8 container clear-both">
+    ... sorry, we don't have enough datas to display for the given stock's
+    symbol ...
+  </div>
+</ng-template>

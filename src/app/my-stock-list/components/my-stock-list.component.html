@@ -1,0 +1,142 @@
+<div class="grid gap-4 grid-cols-3 mx-auto text-center py-6">
+  <div>&nbsp;</div>
+  <div class="bg-red-100 rounded-lg p-7">
+    <p class="text-4xl font-bold">My Stock List</p>
+    <p class="text-xl mb-3 mt-2">
+      Enter the symbol of a stock to track (i.e. AAPL, TSLA, GOOGL ...)
+    </p>
+    <div class="grid grid-cols-2">
+      <input
+        id="stockInput"
+        name="stockInput"
+        class="form-input text-left py-3 px-5 rounded-full"
+        type="text"
+        placeholder="Insert a stock's symbol..."
+        maxlength="5"
+        required
+        [(ngModel)]="stockSymbol"
+        #stockInput="ngModel"
+        (keyup)="getPossibleNames()"
+        list="stockInputOptions"
+      />
+      <datalist
+        id="stockInputOptions"
+        *ngIf="
+          stockInputOptions.length > 1 ||
+          (stockInputOptions.length === 1 &&
+            stockInputOptions[0]?.key !== stockSymbol)
+        "
+      >
+        <option *ngFor="let item of stockInputOptions" [value]="item.key">
+          {{ item.value }}
+        </option>
+      </datalist>
+      <button
+        id="trackBtn"
+        class="bg-blue-700 text-white italic font-bold py-2 ml-10 float-right rounded-lg disabled:bg-blue-400"
+        (click)="trackNewSymbol()"
+        [disabled]="stockInput.invalid"
+      >
+        ➜ Track Stock
+      </button>
+    </div>
+  </div>
+</div>
+
+<div
+  class="grid grid-cols-3 gap-3 px-4 mt-7"
+  *ngIf="
+    collectingData && stocksTracked?.length !== 0;
+    else collectingDataTemplate
+  "
+>
+  <div
+    *ngFor="let stock of stocksTracked"
+    class="rounded-lg bg-white p-5 relative"
+  >
+    <div
+      class="absolute font-bold text-3xl -right-3 -top-3 cursor-pointer"
+      (click)="untrackStock(stock)"
+      [id]="'remove' + stock.key.symbol"
+    >
+      ⛒
+    </div>
+    <div class="flex flex-row">
+      <span class="font-bold text-3xl basis-4/5">
+        {{ stock.key.description | cutWords : 14 }}
+      </span>
+      <span
+        class="rounded-lg bg-green-400 text-white p-2 basis-1/5 text-center"
+        [ngClass]="
+          stock.value.dp > 0
+            ? { 'bg-green-400': true }
+            : stock.value.dp < 0
+            ? { 'bg-red-400': true }
+            : { 'bg-gray': true }
+        "
+      >
+        <span class="font-bold text-xl text-right"
+          >{{
+            stock.value.dp > 0 ? "🡽" : stock.value.dp < 0 ? "🡾" : "⇌"
+          }}&nbsp;{{ stock.key.symbol }}</span
+        >
+      </span>
+    </div>
+
+    <div
+      class="container clear-both pt-4"
+      *ngIf="stock.value.c; else noDatasTemplate"
+    >
+      <div class="grid grid-cols-3 gap-1">
+        <div>
+          <p class="font-bold">Previous Close:</p>
+          <span>{{ stock.value.pc | currency }}</span>
+        </div>
+        <div>
+          <p class="font-bold">Current Price:</p>
+          <span>🡒 {{ stock.value.c | currency }}</span>
+        </div>
+        <div>
+          <p class="font-bold">Percent Change:</p>
+          <span
+            >{{ stock.value.dp > 0 ? "+ " : ""
+            }}{{ stock.value.dp | number : "1.2-5" }} %</span
+          >
+        </div>
+        <div>
+          <p class="font-bold">Lower Price:</p>
+          <span>{{ stock.value.l | currency }}</span>
+        </div>
+        <div>
+          <p class="font-bold">Higher Price:</p>
+          <span>{{ stock.value.h | currency }}</span>
+        </div>
+        <div class="relative">
+          <p
+            class="absolute text-xs text-blue-600 bottom-0 right-0 cursor-pointer"
+            routerLink=""
+            [id]="'sentiment' + stock.key.symbol"
+            (click)="goToSentiment(stock.key.symbol)"
+          >
+            See Sentiment's Details
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #noDatasTemplate>
+  <div class="italic text-2xl px-8 my-8 container clear-both">
+    ... sorry, we don't have enough datas to display for the given stock's
+    symbol ...
+  </div>
+</ng-template>
+
+<ng-template #collectingDataTemplate>
+  <div
+    class="italic text-2xl px-16 my-8 container clear-both rounded-lg bg-white"
+  >
+    ... wait, we are collecting the datas you stored ...
+  </div>
+</ng-template>
