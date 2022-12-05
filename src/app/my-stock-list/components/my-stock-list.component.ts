@@ -21,7 +21,6 @@ export class MyStockListComponent implements OnInit {
   constructor(private service: MyStockListService, private router: Router) {}
 
   ngOnInit(): void {
-    debugger;
     const stockToTrack = JSON.parse(
       localStorage.getItem('stockToTrack') || '[]'
     );
