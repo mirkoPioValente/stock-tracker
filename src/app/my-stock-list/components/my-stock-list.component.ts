@@ -21,6 +21,7 @@ export class MyStockListComponent implements OnInit {
   constructor(private service: MyStockListService, private router: Router) {}
 
   ngOnInit(): void {
+    debugger;
     const stockToTrack = JSON.parse(
       localStorage.getItem('stockToTrack') || '[]'
     );
@@ -83,6 +84,7 @@ export class MyStockListComponent implements OnInit {
         .getAllInfo(stock)
         .subscribe((res: KeyValue<SymbolData, StockInfo>) => {
           this.stocksTracked.push(res);
+          this.collectingData = false;
         });
     });
   }
